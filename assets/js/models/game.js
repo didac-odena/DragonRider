@@ -19,7 +19,7 @@ class Game {
     this.player = new Player(
       this.ctx,
       CANVAS_W / 2 - Player.WIDTH / 2, // centrado en X
-      CANVAS_H - Player.HEIGHT - 5 // pegado abajo con 5 px de margen
+      CANVAS_H - Player.HEIGHT - PLAYER_MARGIN // pegado abajo con 5 px de margen
     );
 
     this.drawIntervalId = null; // Id del setInterval del loop de dibujo
@@ -58,17 +58,16 @@ class Game {
   }
 
   move() {
-    function checkBounds() {
-      
-    }
-
-
     this.player.move();
-    checkBounds();
+    this.checkBounds();
   }
 
-  checkBounds(){    //controla el maximo de movimiento
-
+  checkBounds(){    //controla el maximo de posicion en X de player
+    if (this.player.x < PLAYER_MARGIN) {
+      this.player.x = PLAYER_MARGIN;
+    } else if (this.player.x > CANVAS_W - this.player.h - PLAYER_MARGIN) {
+      this.player.x = CANVAS_W - this.player.h - PLAYER_MARGIN
+    }
 
   }
 
