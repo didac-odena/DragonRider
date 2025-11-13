@@ -1,7 +1,7 @@
 class Player {
   // constantes de tamaño del jugador (para poder usarlas al crear y al centrar en el canvas)
-  static WIDTH = 50;
-  static HEIGHT = 50;
+  static WIDTH = 75;
+  static HEIGHT = 75;
 
   constructor(ctx, x, y) {
     this.ctx = ctx;
@@ -27,6 +27,8 @@ class Player {
       this.w = Player.WIDTH;
       this.h = Player.HEIGHT;
     };
+
+    this.drawCount = 0; //sirve para contar las veces que se pinta de cara a animateFrames
   }
 
   onKeyPress(event) {
@@ -65,19 +67,28 @@ class Player {
         this.h
       );
       this.animate();
+      this.drawCount++;
     }
   }
 
   animate() {
-    if (this.vx > 0) {
-      this.sprite.vFrameIndex = 1;
-      this.sprite.hFrameIndex = 2;
+    if (this.vx > 0) {    
+      this.animateFrames(2, 0, 3, 10);
     } else if (this.vx < 0) {
-      this.sprite.vFrameIndex = 1;
-      this.sprite.hFrameIndex = 1;
+      this.animateFrames(1, 0, 3, 10);
     } else {
-      this.sprite.vFrameIndex = 1;
-      this.sprite.hFrameIndex = 3;
+      this.animateFrames(3, 0, 3, 10);
     }
+  }
+
+  animateFrames(initialHFrame, initialVFrame, frames, frequency) {   
+    if (this.sprite.hFrameIndex !== initialHFrame){
+      this.sprite.hFrameIndex = initialHFrame;
+      this.sprite.vFrameIndex = initialVFrame;
+    } else if (this.drawCount % frequency === 0) {
+      this.drawCount = 0;
+      this.sprite.vFrameIndex = (this.sprite.vFrameIndex + 1) % frames;
+    }
+    
   }
 }

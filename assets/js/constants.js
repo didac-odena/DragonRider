@@ -16,9 +16,9 @@ const KEY_RIGHT = 39;
 const KEY_LEFT = 37;
 
 //==PLAYER SETTINGS==
-const PLAYER_SPEED = 5;
+const PLAYER_SPEED = 8;
 
 //==UNDEFINED
-const DEBUG = true; //activa/desactiva el modo debug
+const DEBUG = false; //activa/desactiva el modo debug
 
 
