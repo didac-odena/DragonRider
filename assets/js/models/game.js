@@ -8,13 +8,12 @@ class Game {
     this.canvas.width = CANVAS_W;
     this.canvas.height = CANVAS_H;
     this.ctx = this.canvas.getContext("2d");
-    this.ctx.imageSmoothingEnabled = false; // activar si es necesario para efecto pixel
+    this.ctx.imageSmoothingEnabled = true; // activar si es necesario para efecto pixel
 
-    // Timing del loop
     this.fps = FPS;
-    this._loopId = null; // Id del setInterval del loop
+    this._loopId = null; 
 
-    // Controladores y entidades
+    // Controladores y entidades del bg
     this.bg = new BackgroundController(this.ctx); // Fondo: spawns + pintado
     this.player = new Player(
       this.ctx,
@@ -24,8 +23,6 @@ class Game {
 
     this.drawIntervalId = null; // Id del setInterval del loop de dibuj
 
-    // STOP this.coins = []
-
     // enemigos
     const rock = new Rock(
       this.ctx,
@@ -33,6 +30,10 @@ class Game {
       -Rock.HEIGHT
     );
     this.enemies = [rock];
+    this.rockSpawnTimeoutId = null;
+    this.rockDifficultyIntervalId = null;
+    this.rockMinDelay = ROCK_SPAWN_MIN_MS;
+    this.rockMaxDelay = ROCK_SPAWN_MAX_MS;
   }
 
   /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -42,6 +43,26 @@ class Game {
     if (!this.drawIntervalId) {
       this.setupListener();
       this.bg.start();
+      this.rockSpawn();
+
+      this.rockDifficultyIntervalId = setInterval(() => {
+        this.rockMinDelay = Math.max(
+          ROCK_SPAWN_MIN_LIMIT_MS,
+          this.rockMinDelay * ROCK_SPAWN_DELTA_MS
+        );
+
+        this.rockMaxDelay = Math.max(
+          this.rockMinDelay + 50, // que max nunca sea menor que min
+          this.rockMaxDelay * ROCK_SPAWN_DELTA_MS
+        );
+
+        console.log(
+          "Nueva ventana spawn:",
+          this.rockMinDelay.toFixed(2),
+          this.rockMaxDelay.toFixed(2)
+        );
+      }, ROCK_SPAWN_STEP_MS);
+
       this.drawIntervalId = setInterval(() => {
         this.clear();
         this.move();
@@ -59,9 +80,16 @@ class Game {
   stop() {
     clearInterval(this.drawIntervalId);
     this.drawIntervalId = undefined;
-    //if (this.drawIntervalId) {
-    // clearInterval(this.drawIntervalId);
-    //this.drawIntervalId = null;
+
+    if (this.rockSpawnTimeoutId) {
+      clearTimeout(this.rockSpawnTimeoutId);
+      this.rockSpawnTimeoutId = null;
+    }
+
+    if (this.rockDifficultyIntervalId) {
+      clearInterval(this.rockDifficultyIntervalId);
+      this.rockDifficultyIntervalId = null;
+    }
   }
 
   clear() {
@@ -82,7 +110,6 @@ class Game {
       this.player.x = CANVAS_W - this.player.w - PLAYER_MARGIN;
     }
   }
-  //==========COLISIONES
 
   checkCollisions() {
     // ROCK COLLISIONS
@@ -99,11 +126,30 @@ class Game {
     console.log("GAME OVER");
   }
 
-  ////===============
   draw() {
-    // Solo pintar (sin clear ni move)
     this.bg.updateAndDraw();
     this.enemies.forEach((enemy) => enemy.draw());
     this.player.draw();
+  }
+
+  // =================== SPAWN DE ROCAS ===================
+  rockSpawn() {
+    const min = this.rockMinDelay;
+    const max = this.rockMaxDelay;
+    const delay = Math.floor(min + Math.random() * (max - min));
+
+    this.rockSpawnTimeoutId = setTimeout(() => {
+      const x = Math.floor(Math.random() * (CANVAS_W - Rock.WIDTH));
+      const y = -Rock.HEIGHT;
+
+      // velocidad aleatoria entre ROCK_SPEED_MIN y ROCK_SPEED_MAX
+      const speedY =
+        ROCK_SPEED_MIN + Math.random() * (ROCK_SPEED_MAX - ROCK_SPEED_MIN);
+
+      this.enemies.push(new Rock(this.ctx, x, y, speedY));
+
+      // siguiente spawn
+      this.rockSpawn();
+    }, delay);
   }
 }

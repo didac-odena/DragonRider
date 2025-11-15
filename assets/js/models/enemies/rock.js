@@ -3,20 +3,20 @@ class Rock {
   static HEIGHT = 64;
   static FALL_SPEED = 3; // píxeles por frame
   static ANIM_FREQ = 6; // cada cuántos draws avanza un frame
-  static INSET_HITBOX = 15;
+  static INSET_HITBOX = 30;
 
-  constructor(ctx, x, y) {
+  constructor(ctx, x, y, speedY) {
     this.ctx = ctx;
     this.x = x;
     this.y = y;
     this.w = Rock.WIDTH;
     this.h = Rock.HEIGHT;
 
-    this.vy = Rock.FALL_SPEED;
+    this.vy = speedY ?? Rock.FALL_SPEED;
 
-    // --- Sprite 8x8 ---
-    this.sprite = new Image();
-    this.sprite.src = "/assets/images/rock-sprite2.png";
+
+    this.sprite = new Image();    
+    this.sprite.src = "/assets/images/rock-sprite.png";// --- Sprite 8x8 ---
 
     this.sprite.vFrames = 8; // columnas
     this.sprite.hFrames = 8; // filas
@@ -27,16 +27,17 @@ class Rock {
       this.sprite.isReady = true;
       this.sprite.frameW = Math.floor(this.sprite.width / this.sprite.vFrames);
       this.sprite.frameH = Math.floor(this.sprite.height / this.sprite.hFrames);
+      
       this.w = Rock.WIDTH;
       this.h = Rock.HEIGHT;
     };
 
     this.drawCount = 0;
   }
-  /////////////////////////////////////////////
+
   move() {
     this.y += this.vy;
-  }
+  };
 
   draw() {
     if (!this.sprite.isReady) return;
