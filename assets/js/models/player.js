@@ -72,7 +72,7 @@ class Player {
   }
 
   animate() {
-    if (this.vx > 0) {    
+    if (this.vx > 0) {
       this.animateFrames(2, 0, 3, 10);
     } else if (this.vx < 0) {
       this.animateFrames(1, 0, 3, 10);
@@ -81,14 +81,29 @@ class Player {
     }
   }
 
-  animateFrames(initialHFrame, initialVFrame, frames, frequency) {   
-    if (this.sprite.hFrameIndex !== initialHFrame){
+  animateFrames(initialHFrame, initialVFrame, frames, frequency) {
+    if (this.sprite.hFrameIndex !== initialHFrame) {
       this.sprite.hFrameIndex = initialHFrame;
       this.sprite.vFrameIndex = initialVFrame;
     } else if (this.drawCount % frequency === 0) {
       this.drawCount = 0;
       this.sprite.vFrameIndex = (this.sprite.vFrameIndex + 1) % frames;
     }
-    
   }
+
+collidesWith(other) {
+  if (!other) return false;
+
+  // Si el enemigo tiene getHitbox (Rock), la usamos. Si no, usamos sus x,y,w,h directos.
+  const b = typeof other.getHitbox === "function"
+    ? other.getHitbox()
+    : { x: other.x, y: other.y, w: other.w, h: other.h };
+
+  return (
+    this.x < b.x + b.w &&
+    this.x + this.w > b.x &&
+    this.y < b.y + b.h &&
+    this.y + this.h > b.y
+  );
+}
 }

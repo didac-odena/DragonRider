@@ -22,10 +22,20 @@ class Game {
       CANVAS_H - Player.HEIGHT - PLAYER_MARGIN // pegado abajo con 5 px de margen
     );
 
-    this.drawIntervalId = null; // Id del setInterval del loop de dibujo
+    this.drawIntervalId = null; // Id del setInterval del loop de dibuj
 
-    //listeners agrupados aqui
+    // STOP this.coins = []
+
+    // enemigos
+    const rock = new Rock(
+      this.ctx,
+      CANVAS_W / 2 - Rock.WIDTH / 2,
+      -Rock.HEIGHT
+    );
+    this.enemies = [rock];
   }
+
+  /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   start() {
     // Arranca una sola vez: enciende spawner de fondo + loop de render
@@ -36,21 +46,22 @@ class Game {
         this.clear();
         this.move();
         this.draw();
+        this.checkCollisions();
       }, this.fps);
     }
   }
 
   setupListener() {
-    addEventListener('keydown', (event) => this.player.onKeyPress(event));
-    addEventListener('keyup', (event) => this.player.onKeyPress(event));
+    addEventListener("keydown", (event) => this.player.onKeyPress(event));
+    addEventListener("keyup", (event) => this.player.onKeyPress(event));
   }
 
-  // Añadido para que puedas parar el loop cuando quieras (alineado con el patrón del bootcamp)
   stop() {
-    if (this.drawIntervalId) {
-      clearInterval(this.drawIntervalId);
-      this.drawIntervalId = null;
-    }
+    clearInterval(this.drawIntervalId);
+    this.drawIntervalId = undefined;
+    //if (this.drawIntervalId) {
+    // clearInterval(this.drawIntervalId);
+    //this.drawIntervalId = null;
   }
 
   clear() {
@@ -58,22 +69,41 @@ class Game {
   }
 
   move() {
+    this.enemies.forEach((enemy) => enemy.move());
     this.player.move();
     this.checkBounds();
   }
 
-  checkBounds(){    //controla el maximo de posicion en X de player
+  checkBounds() {
+    //controla el maximo de posicion en X de player
     if (this.player.x < PLAYER_MARGIN) {
       this.player.x = PLAYER_MARGIN;
-    } else if (this.player.x > CANVAS_W - this.player.h - PLAYER_MARGIN) {
-      this.player.x = CANVAS_W - this.player.h - PLAYER_MARGIN
+    } else if (this.player.x > CANVAS_W - this.player.w - PLAYER_MARGIN) {
+      this.player.x = CANVAS_W - this.player.w - PLAYER_MARGIN;
     }
+  }
+  //==========COLISIONES
 
+  checkCollisions() {
+    // ROCK COLLISIONS
+    for (const enemy of this.enemies) {
+      if (this.player.collidesWith(enemy)) {
+        this.gameOver();
+        break;
+      }
+    }
   }
 
+  gameOver() {
+    this.stop();
+    console.log("GAME OVER");
+  }
+
+  ////===============
   draw() {
     // Solo pintar (sin clear ni move)
     this.bg.updateAndDraw();
+    this.enemies.forEach((enemy) => enemy.draw());
     this.player.draw();
   }
 }
