@@ -34,6 +34,8 @@ class Game {
     this.rockDifficultyIntervalId = null;
     this.rockMinDelay = ROCK_SPAWN_MIN_MS;
     this.rockMaxDelay = ROCK_SPAWN_MAX_MS;
+
+    this.isPaused = false;
   }
 
   /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -57,7 +59,7 @@ class Game {
         );
 
         console.log(
-          "Nueva ventana spawn:",
+          "Nuevo spawn:",
           this.rockMinDelay.toFixed(2),
           this.rockMaxDelay.toFixed(2)
         );
@@ -90,6 +92,10 @@ class Game {
       clearInterval(this.rockDifficultyIntervalId);
       this.rockDifficultyIntervalId = null;
     }
+  }
+
+  togglePause() {
+    this.isPaused ? (!this.isPaused) : (this.isPaused = true);  
   }
 
   clear() {

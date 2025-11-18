@@ -16,18 +16,18 @@ const KEY_RIGHT = 39;
 const KEY_LEFT = 37;
 
 //==PLAYER SETTINGS==
-const PLAYER_SPEED = 8;
+const PLAYER_SPEED = 5;
 
 //==UNDEFINED
 const DEBUG = false; //activa/desactiva el modo debug
 
 // Spawn de rocas
-const ROCK_SPAWN_MIN_MS        = 1800;   // ventana inicial: min
-const ROCK_SPAWN_MAX_MS        = 2600;   // ventana inicial: max
-const ROCK_SPAWN_STEP_MS       = 5000;  // cada 30s sube dificultad
-const ROCK_SPAWN_MIN_LIMIT_MS  = 100;    // nunca bajar de aquí
-const ROCK_SPAWN_DELTA_MS      = 0.75;    // cuánto reducimos min y max cada step
+const ROCK_SPAWN_MIN_MS        = 800;   // ventana inicial: min
+const ROCK_SPAWN_MAX_MS        = 1200;   // ventana inicial: max
+const ROCK_SPAWN_STEP_MS       = 4000;  // cada 30s sube dificultad
+const ROCK_SPAWN_MIN_LIMIT_MS  = 250;    // nunca bajar de aquí
+const ROCK_SPAWN_DELTA_MS      = 0.95;    // cuánto reducimos min y max cada step
 
 // Velocidad de rocas
 const ROCK_SPEED_MIN = 1;
-const ROCK_SPEED_MAX = 8;
+const ROCK_SPEED_MAX = 7;

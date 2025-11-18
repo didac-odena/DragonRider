@@ -8,11 +8,5 @@ class Utils {
       drawable.ctx.restore(); // sirve para recuperar el canvas, si no se hace esto queda todo el ctx editado
     }
   }
+}
 
-  static togglePixelEffect(enable) {
-  this.ctx.imageSmoothingEnabled = !enable ? true : false;
-  this.ctx.mozImageSmoothingEnabled = !enable ? true : false;
-  this.ctx.webkitImageSmoothingEnabled = !enable ? true : false;
-  this.ctx.msImageSmoothingEnabled = !enable ? true : false;
-}
-}

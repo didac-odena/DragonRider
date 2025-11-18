@@ -73,6 +73,7 @@ class Rock {
         (this.sprite.hFrameIndex + 1) % this.sprite.hFrames;
     }
   }
+  
   getHitbox() {    //corrige el aire del srpite
     return {
       x: this.x + Rock.INSET_HITBOX,
