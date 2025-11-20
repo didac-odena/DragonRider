@@ -8,10 +8,10 @@ class Game {
     this.canvas.width = CANVAS_W;
     this.canvas.height = CANVAS_H;
     this.ctx = this.canvas.getContext("2d");
-    this.ctx.imageSmoothingEnabled = true; // activar si es necesario para efecto pixel
+    this.ctx.imageSmoothingEnabled = true;
 
     this.fps = FPS;
-    this._loopId = null; 
+    this._loopId = null;
 
     // Controladores y entidades del bg
     this.bg = new BackgroundController(this.ctx); // Fondo: spawns + pintado
@@ -35,48 +35,130 @@ class Game {
     this.rockMinDelay = ROCK_SPAWN_MIN_MS;
     this.rockMaxDelay = ROCK_SPAWN_MAX_MS;
 
+    this.pauseButton = document.getElementById("pause-button");
+    this.isGameOver = false;
+
+    //TIMER
+    this.timerElement = document.getElementById("timer");
     this.isPaused = false;
+    this.elapsedMs = 0;
+    this._timerId = null; // id del intervalo del timer
+    this._listenersSetup = false; // flag para no duplicar listeners
+    this.timer();
   }
 
   /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+  
   start() {
-    // Arranca una sola vez: enciende spawner de fondo + loop de render
-    if (!this.drawIntervalId) {
-      this.setupListener();
-      this.bg.start();
+    if (this.drawIntervalId) return;
+
+    this.setupListener();
+    this._startStatus();
+    this._startSystems();
+    this._startLoop();
+  }
+
+  _startStatus() {
+    this.isGameOver = false;
+    this.isPaused = false;
+    this._resetTimer();
+  }
+
+  _startSystems() {
+    this.bg.start();
+    this.rockSpawn();
+    this._startTimer();
+
+    this.rockDifficultyIntervalId = setInterval(() => {
+      if (this.isPaused || this.isGameOver) return;
+      this.rockMinDelay = Math.max(
+        ROCK_SPAWN_MIN_LIMIT_MS,
+        this.rockMinDelay * ROCK_SPAWN_DELTA_MS
+      );
+      this.rockMaxDelay = Math.max(
+        this.rockMinDelay + 50,
+        this.rockMaxDelay * ROCK_SPAWN_DELTA_MS
+      );
+      console.log(
+        "Nuevo spawn:",
+        this.rockMinDelay.toFixed(2),
+        this.rockMaxDelay.toFixed(2)
+      );
+    }, ROCK_SPAWN_STEP_MS);
+  }
+
+  _startLoop() {
+    this.drawIntervalId = setInterval(() => {
+      if (this.isPaused) return;
+      this.clear();
+      this.move();
+      this.draw();
+      this.checkCollisions();
+    }, this.fps);
+  }
+  
+  pause() {
+    if (this.rockSpawnTimeoutId) {
+      clearTimeout(this.rockSpawnTimeoutId);
+      this.rockSpawnTimeoutId = null;
+    }
+    // el timer y la dificultad ya respetan isPaused, no hace falta tocarlos
+  }
+
+  resume() {
+    // reanuda spawn solo si no hay timeout activo y no es game over
+    if (!this.isGameOver && !this.rockSpawnTimeoutId) {
       this.rockSpawn();
+    }
+  }
 
-      this.rockDifficultyIntervalId = setInterval(() => {
-        this.rockMinDelay = Math.max(
-          ROCK_SPAWN_MIN_LIMIT_MS,
-          this.rockMinDelay * ROCK_SPAWN_DELTA_MS
-        );
+  timer() {
+    if (!this.timerElement) return;
+    this.timerElement.textContent = this._formatTime(this.elapsedMs);
+  }
 
-        this.rockMaxDelay = Math.max(
-          this.rockMinDelay + 50, // que max nunca sea menor que min
-          this.rockMaxDelay * ROCK_SPAWN_DELTA_MS
-        );
+  _formatTime(ms) {
+    const totalSeconds = Math.floor(ms / 1000);
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
 
-        console.log(
-          "Nuevo spawn:",
-          this.rockMinDelay.toFixed(2),
-          this.rockMaxDelay.toFixed(2)
-        );
-      }, ROCK_SPAWN_STEP_MS);
+    const mm = String(minutes).padStart(2, "0");
+    const ss = String(seconds).padStart(2, "0");
 
-      this.drawIntervalId = setInterval(() => {
-        this.clear();
-        this.move();
-        this.draw();
-        this.checkCollisions();
-      }, this.fps);
+    return `${mm}:${ss}`;
+  }
+
+  _resetTimer() {
+    this.elapsedMs = 0;
+    this.timer();
+  }
+
+  _startTimer() {
+    if (this._timerId) {
+      clearInterval(this._timerId);
+    }
+
+    this._timerId = setInterval(() => {
+      if (this.isPaused || this.isGameOver) return;
+      this.elapsedMs += 1000;
+      this.timer();
+    }, 1000);
+  }
+
+  _stopTimer() {
+    if (this._timerId) {
+      clearInterval(this._timerId);
+      this._timerId = null;
     }
   }
 
   setupListener() {
+    if (this._listenersSetup) return;
+    addEventListener("click", (event) => this.togglePause(event));
+    addEventListener("keydown", (event) => this.togglePause(event));
     addEventListener("keydown", (event) => this.player.onKeyPress(event));
     addEventListener("keyup", (event) => this.player.onKeyPress(event));
+    this._listenersSetup = true;
   }
 
   stop() {
@@ -92,10 +174,26 @@ class Game {
       clearInterval(this.rockDifficultyIntervalId);
       this.rockDifficultyIntervalId = null;
     }
+
+    this._stopTimer();
   }
 
-  togglePause() {
-    this.isPaused ? (!this.isPaused) : (this.isPaused = true);  
+  togglePause(event) {
+    const isClicked =
+      event.type === "click" && event.target === this.pauseButton;
+
+    const isKeyPressed = event.type === "keydown" && event.keyCode === KEY_P;
+
+    if (isClicked || isKeyPressed) {
+      this.isPaused = !this.isPaused;
+      console.log("PAUSE:", this.isPaused);
+
+      if (this.isPaused) {
+        this.pause(); // parar sistemas que usan timeout
+      } else {
+        this.resume(); // reanudar spawns
+      }
+    }
   }
 
   clear() {
@@ -109,7 +207,6 @@ class Game {
   }
 
   checkBounds() {
-    //controla el maximo de posicion en X de player
     if (this.player.x < PLAYER_MARGIN) {
       this.player.x = PLAYER_MARGIN;
     } else if (this.player.x > CANVAS_W - this.player.w - PLAYER_MARGIN) {
@@ -118,7 +215,6 @@ class Game {
   }
 
   checkCollisions() {
-    // ROCK COLLISIONS
     for (const enemy of this.enemies) {
       if (this.player.collidesWith(enemy)) {
         this.gameOver();
@@ -128,6 +224,7 @@ class Game {
   }
 
   gameOver() {
+    this.isGameOver = true;
     this.stop();
     console.log("GAME OVER");
   }
@@ -138,7 +235,7 @@ class Game {
     this.player.draw();
   }
 
-  // =================== SPAWN DE ROCAS ===================
+  // =================== SPAWN DE ROCAS ==================
   rockSpawn() {
     const min = this.rockMinDelay;
     const max = this.rockMaxDelay;

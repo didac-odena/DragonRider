@@ -14,6 +14,7 @@ const BG_ZOOM = 0.5;
 //keybinds
 const KEY_RIGHT = 39;
 const KEY_LEFT = 37;
+const KEY_P = 80;
 
 //==PLAYER SETTINGS==
 const PLAYER_SPEED = 5;
