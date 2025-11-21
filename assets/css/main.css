@@ -2,12 +2,18 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  justify-items: center;
   flex-direction: column;
   background-color: rgb(19, 43, 12);
   background-image: url(/assets/images/bg-static.jpg);
   background-size: cover;
-  font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+  font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+}
+
+/* Marco del canvas + overlay */
+#game-container {
+  position: relative;
+  width: 600px;
+  height: 600px;
 }
 
 canvas {
@@ -17,25 +23,29 @@ canvas {
   background-color: rgb(133, 183, 90);
   image-rendering: pixelated;
   image-rendering: crisp-edges;
+  width: 100%;
+  height: 100%;
+  display: block;
 }
 
-#main-canvas {
-}
-
+/* Menú in-game */
 .menu-ingame {
   display: flex;
+  flex-direction: row;
   justify-content: space-between;
   width: 600px;
   margin: 5px;
   font-family: fantasy;
 }
 
-#title-text {
+/* Textos tipo logo */
+.title-text {
   width: 25%;
 }
 
+/* Timer */
 #timer {
-      font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+  font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
   width: 25%;
   color: rgb(245, 191, 54);
   text-shadow: 2px 2px 4px #000000;
@@ -43,21 +53,35 @@ canvas {
   text-align: center;
 }
 
+/* Botón pause */
 #pause-button {
-      font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+  font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
   text-shadow: 2px 2px 4px #000000;
   border-color: #d4b46a;
   color: rgb(245, 191, 54);
   font-size: 20px;
-
   background-color: rgba(0, 0, 0, 0.322);
   width: 25%;
-  align-items: center;
-  justify-content: center;
   border-radius: 5px;
   box-shadow: 0 0 10px #00000050;
 }
 #pause-button:hover {
   cursor: pointer;
   background-color: rgba(0, 0, 0, 0.5);
+}
+
+/* Overlay de Game Over */
+#gameover-menu {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.hidden {
+  display: none !important;
 }

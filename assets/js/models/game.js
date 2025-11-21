@@ -48,7 +48,7 @@ class Game {
   }
 
   /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  
+
   start() {
     if (this.drawIntervalId) return;
 
@@ -89,14 +89,16 @@ class Game {
 
   _startLoop() {
     this.drawIntervalId = setInterval(() => {
-      if (this.isPaused) return;
+      // Si está en pausa o en game over, NO tocamos el canvas -> se queda el último frame
+      if (this.isPaused || this.isGameOver) return;
+
       this.clear();
       this.move();
-      this.draw();
-      this.checkCollisions();
+      this.draw();          // 1) PINTAMOS el frame normal
+      this.checkCollisions(); // 2) LUEGO comprobamos colisiones (puede disparar gameOver)
     }, this.fps);
   }
-  
+
   pause() {
     if (this.rockSpawnTimeoutId) {
       clearTimeout(this.rockSpawnTimeoutId);
@@ -189,9 +191,10 @@ class Game {
       console.log("PAUSE:", this.isPaused);
 
       if (this.isPaused) {
-        this.pause(); // parar sistemas que usan timeout
+        this.pause();   
+        this.paintOverlay(); 
       } else {
-        this.resume(); // reanudar spawns
+        this.resume(); 
       }
     }
   }
@@ -227,12 +230,24 @@ class Game {
     this.isGameOver = true;
     this.stop();
     console.log("GAME OVER");
+
+    // oscurecemos el ÚLTIMO frame ya dibujado
+    this.paintOverlay();
+
+    const menu = document.getElementById("gameover-menu");
+    if (menu) menu.classList.remove("hidden");
   }
 
   draw() {
     this.bg.updateAndDraw();
     this.enemies.forEach((enemy) => enemy.draw());
     this.player.draw();
+  }
+
+  // Pinta un overlay oscuro sobre el canvas actual (lo que haya: fondo + árboles + rocas + player)
+  paintOverlay() {
+    this.ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
+    this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
   }
 
   // =================== SPAWN DE ROCAS ==================

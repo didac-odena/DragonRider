@@ -32,15 +32,14 @@ class BackgroundController {
     this._scheduleNextSpawn(); // Arranca el ciclo de spawns aleatorios
   }
 
-  updateAndDraw() {
-    // Pintamos del MÁS NUEVO al MÁS VIEJO (de derecha a izquierda en el array).
-// Así, el elemento más antiguo se dibuja el último y queda por encima.
+updateAndDraw(isFrozen = false) {
+  if (!isFrozen) {
     for (let i = this.items.length - 1; i >= 0; i--) {
       const alive = this.items[i].draw();
       if (alive === false || this.items[i].dead) {
         // Eliminamos del array los que salieron por abajo sin romper el bucle
         this.items.splice(i, 1);
-      }
+      }}
     }
   }
 }

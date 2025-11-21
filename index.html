@@ -7,14 +7,22 @@
     <title>DragonRider</title>
     <link rel="stylesheet" href="/assets/css/main.css" />
   </head>
+
   <body>
+      <div id="game-container">
     <canvas id="main-canvas"></canvas>
 
-    <div class="menu-ingame">
-      <img id="title-text" src="assets/images/dragonrider-text.png" />
-      <div id="timer"> 00:00 </div>
-      <button id="pause-button">PAUSE GAME</button>
+    <div id="gameover-menu" class="hidden">
+      <img class="title-text" src="assets/images/interface/gameover-ui.png" />
+      <img class="title-text" src="assets/images/interface/tryagain-ui.png" />
     </div>
+  </div>
+
+  <div class="menu-ingame">
+    <img class="title-text" src="assets/images/interface/dragonrider-ui.png" />
+    <div id="timer">00:00</div>
+    <button id="pause-button">PAUSE GAME</button>
+  </div>
 
     <script src="assets/js/models/bg/bg-elements.js"></script>
 
@@ -25,7 +33,7 @@
     <script src="assets/js/models/bg/background.js"></script>
     <script src="assets/js/models/enemies/rock.js"></script>
     <script src="assets/js/models/coin.js"></script>
-    
+
     <script src="assets/js/models/player.js"></script>
 
     <script src="assets/js/models/game.js"></script>
