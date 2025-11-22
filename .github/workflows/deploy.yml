@@ -20,4 +20,4 @@ jobs:
         run: npm install -g netlify-cli
 
       - name: Netlify Deploy
-        run: netlify deploy --prod
+        run: netlify deploy --site ${{ secrets.NETLIFY_SITE_ID }} --auth ${{ secrets.NETLIFY_TOKEN }} --prod
