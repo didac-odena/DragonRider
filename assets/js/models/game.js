@@ -38,7 +38,10 @@ class Game {
     this.pauseButton = document.getElementById("pause-button");
     this.isGameOver = false;
 
+    // botones/menus de interfaz
     this.tryAgainButton = document.getElementById("tryagain-ui");
+    this.startMenu = document.getElementById("start-menu");
+    this.startButton = document.getElementById("startgame-ui");
 
     //TIMER
     this.timerElement = document.getElementById("timer");
@@ -157,11 +160,21 @@ class Game {
 
   setupListener() {
     if (this._listenersSetup) return;
+
+    // Try again (recarga)
     addEventListener("click", (event) => this.tryAgain(event));
+
+    // Start game (pantalla inicial)
+    addEventListener("click", (event) => this.startGame(event));
+
+    // Pausa
     addEventListener("click", (event) => this.togglePause(event));
     addEventListener("keydown", (event) => this.togglePause(event));
+
+    // Controles del player
     addEventListener("keydown", (event) => this.player.onKeyPress(event));
     addEventListener("keyup", (event) => this.player.onKeyPress(event));
+
     this._listenersSetup = true;
   }
 
@@ -193,19 +206,43 @@ class Game {
       console.log("PAUSE:", this.isPaused);
 
       if (this.isPaused) {
-        this.pause();   
-        this.paintOverlay(); 
+        this.pause();
+        this.paintOverlay();
       } else {
-        this.resume(); 
+        this.resume();
       }
     }
   }
 
-    tryAgain(event) {
-    const isClicked = event.type === "click" && event.target === this.tryAgainButton;
+  tryAgain(event) {
+    const isClicked =
+      event.type === "click" && event.target === this.tryAgainButton;
     if (isClicked) location.reload();
+  }
+
+  // >>>>>> AQUÍ VA LA LÓGICA DEL START GAME <<<<<<
+  startGame(event) {
+    const isClicked =
+      event.type === "click" && event.target === this.startButton;
+    if (!isClicked) return;
+
+    // Ocultamos el menú de inicio
+    if (this.startMenu) {
+      this.startMenu.classList.add("hidden");
     }
-  
+
+    // Mostramos canvas
+    this.canvas.classList.remove("hidden");
+
+    // Mostramos HUD in-game
+    const ingameMenu = document.querySelector(".menu-ingame");
+    if (ingameMenu) {
+      ingameMenu.classList.remove("hidden");
+    }
+
+    // Arrancamos el juego (si no está ya arrancado)
+    this.start();
+  }
 
   clear() {
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
