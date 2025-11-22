@@ -1,4 +1,12 @@
+html,
 body {
+  margin: 0;
+  padding: 0;
+}
+
+
+body {
+  min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -6,8 +14,11 @@ body {
   background-color: rgb(19, 43, 12);
   background-image: url(/assets/images/bg-static.jpg);
   background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
   font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
 }
+
 
 /* Marco del canvas + overlay */
 #game-container {
@@ -34,7 +45,7 @@ canvas {
   flex-direction: row;
   justify-content: space-between;
   width: 600px;
-  margin: 5px;
+  margin: 15px;
   font-family: fantasy;
 }
 
@@ -70,6 +81,8 @@ canvas {
   background-color: rgba(0, 0, 0, 0.5);
 }
 
+
+
 #gameover-menu {
   position: absolute;
   top: 50%;
@@ -89,6 +102,28 @@ canvas {
   height: auto; /* mantiene proporciones */
 }
 
+#start-menu {
+  position: absolute;
+  top: 55%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  gap: 20px;        /* separación entre título y botón */
+  width: 50%;       /* relativo al canvas */
+}
+
+
+#startgame-ui {
+  width: 80%;
+}
+
+#gameover-menu img#tryagain-ui {
+  width: 40%;
+}
 
 .hidden {
   display: none !important;
@@ -97,3 +132,4 @@ canvas {
 .clickable {
   cursor: pointer;
 }
+
