@@ -11,8 +11,7 @@ class BackgroundController {
   _rand(min, max) {
     return Math.floor(min + Math.random() * (max - min));
   }
-
-  // Programa un ÚNICO spawn con retardo aleatorio y se reprograma a sí mismo tras ejecutarse
+  
   _scheduleNextSpawn() {
     if (this._spawnTimerId) return; // Evita lanzar más de un temporizador a la vez
     const delay = this._rand(BG_SPAWN_MIN_MS, BG_SPAWN_MAX_MS); // Delay aleatorio entre BG_SPAWN_MIN_MS y BG_SPAWN_MAX_MS

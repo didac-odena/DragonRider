@@ -38,6 +38,8 @@ class Game {
     this.pauseButton = document.getElementById("pause-button");
     this.isGameOver = false;
 
+    this.tryAgainButton = document.getElementById("tryagain-ui");
+
     //TIMER
     this.timerElement = document.getElementById("timer");
     this.isPaused = false;
@@ -104,7 +106,6 @@ class Game {
       clearTimeout(this.rockSpawnTimeoutId);
       this.rockSpawnTimeoutId = null;
     }
-    // el timer y la dificultad ya respetan isPaused, no hace falta tocarlos
   }
 
   resume() {
@@ -156,6 +157,7 @@ class Game {
 
   setupListener() {
     if (this._listenersSetup) return;
+    addEventListener("click", (event) => this.tryAgain(event));
     addEventListener("click", (event) => this.togglePause(event));
     addEventListener("keydown", (event) => this.togglePause(event));
     addEventListener("keydown", (event) => this.player.onKeyPress(event));
@@ -198,6 +200,12 @@ class Game {
       }
     }
   }
+
+    tryAgain(event) {
+    const isClicked = event.type === "click" && event.target === this.tryAgainButton;
+    if (isClicked) location.reload();
+    }
+  
 
   clear() {
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
