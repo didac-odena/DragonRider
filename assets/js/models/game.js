@@ -279,28 +279,33 @@ class Game {
 
   // ================== INPUT TÁCTIL ==================
 
-  handlePointerDown(event) {
-    if (this.isGameOver || this.isPaused) {
-      return;
-    }
-
-    // coordenadas del toque respecto al canvas real dibujado
-    const rect = this.canvas.getBoundingClientRect();
-    const x = event.clientX - rect.left;
-
-    // mitad del canvas (en píxeles internos)
-    const half = this.canvas.width / 2;
-
-    // si tocas la mitad izquierda → mover izquierda
-    if (x < half) {
-      this.player.startMoveLeft();
-    } else {
-      this.player.startMoveRight();
-    }
-
-    // evitar scroll del navegador en móvil
-    event.preventDefault();
+handlePointerDown(event) {
+  if (this.isGameOver || this.isPaused) {
+    return;
   }
+
+  // Rectángulo del canvas en la pantalla
+  const rect = this.canvas.getBoundingClientRect();
+
+  // Posición del toque en coordenadas de pantalla (relativa al canvas)
+  const xScreen = event.clientX - rect.left;
+
+  
+  const scaleX = rect.width / this.canvas.width; 
+  const playerCenterCanvas = this.player.x + this.player.w / 2;
+  const playerCenterScreen = playerCenterCanvas * scaleX;
+
+  // Si tocamos a la izquierda del jugador → mover a la izquierda
+  if (xScreen < playerCenterScreen) {
+    this.player.startMoveLeft();
+  } else {
+    this.player.startMoveRight();
+  }
+
+  // evitar scroll del navegador en móvil
+  event.preventDefault();
+}
+
 
   handlePointerUp() {
     this.player.stopMove();

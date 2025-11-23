@@ -8,7 +8,7 @@ body {
 }
 
 body {
-  min-height: 100vh;
+  height: 100dvh;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -21,6 +21,10 @@ body {
   background-attachment: fixed;
 
   font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+}
+
+html, body {
+  overflow: hidden;
 }
 
 /* =========================================================
@@ -54,6 +58,7 @@ canvas {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+  align-content: center;
 
   width: 600px;
   margin: 15px;
@@ -65,25 +70,22 @@ canvas {
 }
 
 #timer {
-  width: 25%;
+  font-family: system-ui, Arial, sans-serif;
+  text-shadow: 2px 2px 4px #000000;
   font-size: 40px;
   color: rgb(245, 191, 54);
+  width: 25%;
   text-align: center;
-  text-shadow: 2px 2px 4px #000000;
 }
 
 #pause-button {
-  width: 25%;
-  font-size: 20px;
-  color: rgb(245, 191, 54);
-
-  padding: 4px;
-  background-color: rgba(0, 0, 0, 0.322);
+  font-family: system-ui, sans-serif;
+  color: #bd8216;
+  padding: 6px 10px;
+  border-radius: 8px;
+  background-color: rgba(0,0,0,0.4);
   border: 2px solid #d4b46a;
-  border-radius: 5px;
-
-  text-shadow: 2px 2px 4px #000000;
-  box-shadow: 0 0 10px #00000050;
+  box-shadow: 0 0 10px #00000080;
 }
 
 #pause-button:hover {

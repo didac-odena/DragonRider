@@ -10,6 +10,14 @@
 
   <body>
     <div id="game-container">
+          <div class="menu-ingame hidden">
+      <img
+        class="title-text"
+        src="assets/images/interface/dragonrider-ui.png"
+      />
+      <div id="timer">00:00</div>
+      <button id="pause-button">PAUSE</button>
+    </div>
       <canvas id="main-canvas" class="hidden"></canvas>
 
       <div id="start-menu">
@@ -50,14 +58,7 @@
       </div>
     </div>
 
-    <div class="menu-ingame hidden">
-      <img
-        class="title-text"
-        src="assets/images/interface/dragonrider-ui.png"
-      />
-      <div id="timer">00:00</div>
-      <button id="pause-button">PAUSE GAME</button>
-    </div>
+
 
     <script src="assets/js/models/bg/bg-elements.js"></script>
 
