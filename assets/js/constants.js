@@ -32,3 +32,7 @@ const ROCK_SPAWN_DELTA_MS      = 0.95;    // cuánto reducimos min y max cada st
 // Velocidad de rocas
 const ROCK_SPEED_MIN = 1;
 const ROCK_SPEED_MAX = 7;
+
+//Scores
+const SCORE_STORAGE_KEY = 'dragonRider_scores';
+const MAX_SCORES = 5;

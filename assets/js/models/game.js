@@ -50,6 +50,8 @@ class Game {
     this._timerId = null; // id del intervalo del timer
     this._listenersSetup = false; // flag para no duplicar listeners
     this.timer();
+
+    this.scoreManager = new ScoreManager();
   }
 
   /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -99,7 +101,7 @@ class Game {
 
       this.clear();
       this.move();
-      this.draw();          // 1) PINTAMOS el frame normal
+      this.draw(); // 1) PINTAMOS el frame normal
       this.checkCollisions(); // 2) LUEGO comprobamos colisiones (puede disparar gameOver)
     }, this.fps);
   }
@@ -146,9 +148,9 @@ class Game {
 
     this._timerId = setInterval(() => {
       if (this.isPaused || this.isGameOver) return;
-      this.elapsedMs += 1000;
+      this.elapsedMs += 100;
       this.timer();
-    }, 1000);
+    }, 100);
   }
 
   _stopTimer() {
@@ -161,20 +163,15 @@ class Game {
   setupListener() {
     if (this._listenersSetup) return;
 
-    // Try again (recarga)
     addEventListener("click", (event) => this.tryAgain(event));
 
-    // Start game (pantalla inicial)
     addEventListener("click", (event) => this.startGame(event));
 
-    // Pausa
     addEventListener("click", (event) => this.togglePause(event));
     addEventListener("keydown", (event) => this.togglePause(event));
 
-    // Controles del player
     addEventListener("keydown", (event) => this.player.onKeyPress(event));
     addEventListener("keyup", (event) => this.player.onKeyPress(event));
-
     this._listenersSetup = true;
   }
 
@@ -272,15 +269,29 @@ class Game {
   }
 
   gameOver() {
+    if (this.isGameOver) {
+      return;
+    }
+
     this.isGameOver = true;
     this.stop();
     console.log("GAME OVER");
 
-    // oscurecemos el ÚLTIMO frame ya dibujado
     this.paintOverlay();
 
+    const finalTime = this.elapsedMs;
+
+    const isRecord = this.scoreManager.isTopScore(finalTime);
+
+    if (isRecord) {
+      this.scoreManager.showHighscorePanel(finalTime);
+      return;
+    }
+
     const menu = document.getElementById("gameover-menu");
-    if (menu) menu.classList.remove("hidden");
+    if (menu) {
+      menu.classList.remove("hidden");
+    }
   }
 
   draw() {

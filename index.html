@@ -19,15 +19,34 @@
           class="clickable"
           src="assets/images/interface/startgame-ui.png"
         />
+        <!-- Top 5 -->
+        <div id="highscore-list-start" class="highscore-list"></div>
       </div>
 
       <div id="gameover-menu" class="hidden">
         <img id="gameover-ui" src="assets/images/interface/gameover-ui.png" />
+        <div id="highscore-list-gameover" class="highscore-list"></div>
         <img
           id="tryagain-ui"
           class="clickable"
           src="assets/images/interface/tryagain-ui.png"
         />
+      </div>
+
+      <div id="highscore-panel" class="hidden">
+        <div class="highscore-box">
+          <p>NEW HIGH SCORE!</p>
+          <p>Time: <span id="highscore-time">00:00</span></p>
+
+          <input
+            id="highscore-name-input"
+            type="text"
+            maxlength="10"
+            placeholder="YOUR NAME"
+          />
+
+          <button id="highscore-save-button">SAVE</button>
+        </div>
       </div>
     </div>
 
@@ -51,6 +70,9 @@
     <script src="assets/js/models/coin.js"></script>
 
     <script src="assets/js/models/player.js"></script>
+
+    <script src="assets/js/models/score-manager.js"></script>
+    <script src="assets/js/models/highscore-ui.js"></script>
 
     <script src="assets/js/models/game.js"></script>
 
