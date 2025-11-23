@@ -45,6 +45,36 @@ class Player {
     }
   }
 
+  // ==== CONTROLES PARA TÁCTIL / CLICK SENCILLO ====
+
+  // Empieza a mover a la izquierda simulando una pulsación de tecla izquierda
+  startMoveLeft() {
+    this.onKeyPress({
+      type: "keydown",
+      keyCode: KEY_LEFT,
+    });
+  }
+
+  // Empieza a mover a la derecha simulando una pulsación de tecla derecha
+  startMoveRight() {
+    this.onKeyPress({
+      type: "keydown",
+      keyCode: KEY_RIGHT,
+    });
+  }
+
+  // Deja de mover al jugador (sueltamos izquierda y derecha)
+  stopMove() {
+    this.onKeyPress({
+      type: "keyup",
+      keyCode: KEY_LEFT,
+    });
+    this.onKeyPress({
+      type: "keyup",
+      keyCode: KEY_RIGHT,
+    });
+  }
+
   move() {
     this.x += this.vx;
   }
@@ -91,19 +121,19 @@ class Player {
     }
   }
 
-collidesWith(other) {
-  if (!other) return false;
+  collidesWith(other) {
+    if (!other) return false;
 
-  // Si el enemigo tiene getHitbox (Rock), la usamos. Si no, usamos sus x,y,w,h directos.
-  const b = typeof other.getHitbox === "function"
-    ? other.getHitbox()
-    : { x: other.x, y: other.y, w: other.w, h: other.h };
+    // Si el enemigo tiene getHitbox (Rock), la usamos. Si no, usamos sus x,y,w,h directos.
+    const b = typeof other.getHitbox === "function"
+      ? other.getHitbox()
+      : { x: other.x, y: other.y, w: other.w, h: other.h };
 
-  return (
-    this.x < b.x + b.w &&
-    this.x + this.w > b.x &&
-    this.y < b.y + b.h &&
-    this.y + this.h > b.y
-  );
-}
+    return (
+      this.x < b.x + b.w &&
+      this.x + this.w > b.x &&
+      this.y < b.y + b.h &&
+      this.y + this.h > b.y
+    );
+  }
 }

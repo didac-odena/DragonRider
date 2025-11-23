@@ -1,5 +1,5 @@
 //==CANVAS SETTINGS==
-const CANVAS_W = 600;
+const CANVAS_W = 400;
 const CANVAS_H = 550;
 const FPS = 1000 / 60;
 const PLAYER_MARGIN = 5;
@@ -34,5 +34,6 @@ const ROCK_SPEED_MIN = 1;
 const ROCK_SPEED_MAX = 7;
 
 //Scores
+
 const SCORE_STORAGE_KEY = 'dragonRider_scores';
 const MAX_SCORES = 5;

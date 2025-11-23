@@ -1,9 +1,11 @@
+/* =========================================================
+   RESET + BODY
+   ========================================================= */
 html,
 body {
   margin: 0;
   padding: 0;
 }
-
 
 body {
   min-height: 100vh;
@@ -11,20 +13,24 @@ body {
   align-items: center;
   justify-content: center;
   flex-direction: column;
+
   background-color: rgb(19, 43, 12);
   background-image: url(/assets/images/bg-static.jpg);
   background-size: cover;
   background-position: center;
   background-attachment: fixed;
+
   font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
 }
 
-
-/* Marco del canvas + overlay */
+/* =========================================================
+   GAME CONTAINER + CANVAS
+   ========================================================= */
 #game-container {
   position: relative;
-  width: 600px;
-  height: 600px;
+  width: min(600px, 100vw - 32px);
+  aspect-ratio: 8 / 11;
+  max-height: calc(100vh - 160px);
 }
 
 canvas {
@@ -32,88 +38,79 @@ canvas {
   box-shadow: 0 0 20px #d4b46a;
   border-radius: 5px;
   background-color: rgb(133, 183, 90);
+
   image-rendering: pixelated;
   image-rendering: crisp-edges;
+
   width: 100%;
   height: 100%;
   display: block;
 }
 
-/* Menú in-game */
+/* =========================================================
+   HUD IN-GAME
+   ========================================================= */
 .menu-ingame {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+
   width: 600px;
   margin: 15px;
   font-family: fantasy;
 }
 
-/* Textos tipo logo */
 .title-text {
   width: 25%;
 }
 
-/* Timer */
 #timer {
-  font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
   width: 25%;
-  color: rgb(245, 191, 54);
-  text-shadow: 2px 2px 4px #000000;
   font-size: 40px;
+  color: rgb(245, 191, 54);
   text-align: center;
+  text-shadow: 2px 2px 4px #000000;
 }
 
-/* Botón pause */
 #pause-button {
-  font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
-  text-shadow: 2px 2px 4px #000000;
-  border-color: #d4b46a;
-  color: rgb(245, 191, 54);
-  font-size: 20px;
-  background-color: rgba(0, 0, 0, 0.322);
   width: 25%;
+  font-size: 20px;
+  color: rgb(245, 191, 54);
+
+  padding: 4px;
+  background-color: rgba(0, 0, 0, 0.322);
+  border: 2px solid #d4b46a;
   border-radius: 5px;
+
+  text-shadow: 2px 2px 4px #000000;
   box-shadow: 0 0 10px #00000050;
 }
+
 #pause-button:hover {
   cursor: pointer;
   background-color: rgba(0, 0, 0, 0.5);
 }
 
-
-
-#gameover-menu {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  align-items: center;
-  gap: 10px;
-  width: 90%;
-  height: 90%;
-}
-
-#gameover-menu img {
-  width: 100%; 
-  height: auto; 
-}
-
+/* =========================================================
+   START MENU
+   ========================================================= */
 #start-menu {
   position: absolute;
-  inset: 0; 
+  inset: 0;
 
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
 
-  gap: 16px;
-  padding: 16px;
+  gap: 12px;
+  padding: 12px;
   box-sizing: border-box;
+}
+
+#start-menu img {
+  max-width: 100%;
+  height: auto;
 }
 
 #startgame-ui {
@@ -121,14 +118,43 @@ canvas {
   max-width: 320px;
 }
 
-/* ===== Panel de NEW HIGH SCORE ===== */
+/* =========================================================
+   GAME OVER MENU
+   ========================================================= */
+#gameover-menu {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+
+  gap: 10px;
+  width: 90%;
+  height: 90%;
+}
+
+#gameover-menu img {
+  width: 100%;
+  height: auto;
+}
+
+#gameover-menu img#tryagain-ui {
+  width: 40%;
+}
+
+/* =========================================================
+   HIGH SCORE PANEL
+   ========================================================= */
 #highscore-panel {
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  /* ocupa una parte del canvas, no todo */
+
   width: 70%;
   max-width: 420px;
 
@@ -136,16 +162,16 @@ canvas {
   align-items: center;
   justify-content: center;
 
-  z-index: 10;          /* por encima del gameover-menu */
-  pointer-events: auto; /* permite hacer click en botón/input */
+  z-index: 10;
+  pointer-events: auto;
 }
 
 .highscore-box {
   width: 100%;
   padding: 18px 24px;
 
-  background: rgba(19, 43, 12, 0.92);      /* verde oscuro semitransparente */
-  border: 4px ridge #bd8216;               /* mismo estilo que el canvas */
+  background: rgba(19, 43, 12, 0.92);
+  border: 4px ridge #bd8216;
   border-radius: 6px;
   box-shadow: 0 0 20px #000000cc;
 
@@ -154,9 +180,8 @@ canvas {
   align-items: center;
   gap: 10px;
 
-  color: rgb(245, 191, 54);                /* dorado */
+  color: rgb(245, 191, 54);
   text-shadow: 2px 2px 4px #000000;
-  font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
 }
 
 .highscore-box p {
@@ -165,27 +190,26 @@ canvas {
 }
 
 .highscore-box p:first-child {
-  font-size: 28px;         /* "NEW HIGH SCORE!" */
+  font-size: 28px;
   letter-spacing: 1px;
 }
 
 #highscore-time {
-  font-size: 24px;         /* 00:12.3 */
+  font-size: 24px;
 }
 
-/* Input del nombre */
 #highscore-name-input {
-  margin-top: 6px;
   width: 80%;
   padding: 6px 10px;
+  margin-top: 6px;
 
   background-color: rgba(0, 0, 0, 0.6);
   border: 2px solid #d4b46a;
   border-radius: 4px;
 
-  color: rgb(245, 191, 54);
   font-size: 16px;
   text-align: center;
+  color: rgb(245, 191, 54);
   text-shadow: 1px 1px 2px #000000;
 }
 
@@ -193,19 +217,18 @@ canvas {
   color: rgba(245, 191, 54, 0.6);
 }
 
-/* Botón GUARDAR (mismo estilo que PAUSE GAME) */
 #highscore-save-button {
   margin-top: 8px;
   padding: 6px 16px;
 
-  font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
   font-size: 18px;
   color: rgb(245, 191, 54);
-  text-shadow: 2px 2px 4px #000000;
 
   background-color: rgba(0, 0, 0, 0.45);
   border: 2px solid #d4b46a;
   border-radius: 5px;
+
+  text-shadow: 2px 2px 4px #000000;
   box-shadow: 0 0 10px #00000080;
 
   cursor: pointer;
@@ -215,38 +238,39 @@ canvas {
   background-color: rgba(0, 0, 0, 0.7);
 }
 
+/* =========================================================
+   HIGH SCORE LIST (START + GAME OVER)
+   ========================================================= */
 .highscore-list {
   width: 80%;
   margin-top: 10px;
+
   color: rgb(245, 191, 54);
-  text-shadow: 1px 1px 2px #000000;
-  font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
   font-size: 18px;
   text-align: center;
-}
 
-#highscore-list-start::before {
-  content: "Top 5";
-  display: block;
-  margin-bottom: 4px;
-  font-size: 25px;
-  font-weight: bold;
-  text-shadow: 2px 2px 4px #000000;
+  font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+  text-shadow: 1px 1px 2px #000000;
 }
 
 .highscore-list div {
   margin: 4px 0;
 }
 
+/* Título Top 5 solo en Start */
+#highscore-list-start::before {
+  content: "Top 5";
+  display: block;
+  margin-bottom: 4px;
 
-#startgame-ui {
-  width: 80%;
+  font-size: 25px;
+  font-weight: bold;
+  text-shadow: 2px 2px 4px #000000;
 }
 
-#gameover-menu img#tryagain-ui {
-  width: 40%;
-}
-
+/* =========================================================
+   UTILIDADES
+   ========================================================= */
 .hidden {
   display: none !important;
 }
@@ -255,3 +279,44 @@ canvas {
   cursor: pointer;
 }
 
+/* =========================================================
+   MEDIA QUERIES
+   ========================================================= */
+
+/* Alturas muy bajas */
+@media (max-height: 600px) {
+  #start-menu {
+    gap: 8px;
+    padding: 8px;
+  }
+
+  .highscore-list {
+    font-size: 14px;
+  }
+}
+
+/* Version móvil (ancho bajo) */
+@media (max-width: 768px) {
+  #game-container {
+    width: min(95vw, 500px);
+    max-height: calc(100vh - 140px);
+  }
+
+  .menu-ingame {
+    width: min(95vw, 500px);
+    margin: 8px 0;
+  }
+
+  #timer {
+    font-size: 28px;
+  }
+
+  #pause-button {
+    font-size: 14px;
+    padding: 4px 8px;
+  }
+
+  .title-text {
+    width: 35%;
+  }
+}
