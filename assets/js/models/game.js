@@ -17,6 +17,7 @@ class Game {
       document.getElementById("mute-toggle-menu"),
       document.getElementById("mute-toggle-ingame"),
     ].filter(Boolean);
+    this.sound.playMusic(this.sound.musicGameOver);
 
     // Instructions overlay
     this.instructionsImg = new Image();
