@@ -1,30 +1,43 @@
 // ======================================================================
-// Orquestador del juego. SOLO Mantiene el loop y delega en los controladores.
+// Game Orchestrator – main loop and high-level systems
 // ======================================================================
 
 class Game {
   constructor(canvasID) {
-    // Canvas y contexto
+    // Canvas setup
     this.canvas = document.getElementById(canvasID);
     this.canvas.width = CANVAS_W;
     this.canvas.height = CANVAS_H;
     this.ctx = this.canvas.getContext("2d");
     this.ctx.imageSmoothingEnabled = true;
 
-    // FPS / loop
+    // Sound
+    this.sound = new SoundManager();
+    this.muteButtons = [
+      document.getElementById("mute-toggle-menu"),
+      document.getElementById("mute-toggle-ingame"),
+    ].filter(Boolean);
+
+    // Instructions overlay
+    this.instructionsImg = new Image();
+    this.instructionsImg.src = "assets/images/interface/instructions-ui.png";
+    this.showInstructions = false;
+    this.instructionsStartMs = 0;
+
+    // Loop / FPS
     this.fps = FPS;
     this._loopId = null;
-    this.drawIntervalId = null; // Id del setInterval del loop de dibujo
+    this.drawIntervalId = null;
 
-    // Fondo y jugador
-    this.bg = new BackgroundController(this.ctx); // Fondo: spawns + pintado
+    // Background & player
+    this.bg = new BackgroundController(this.ctx);
     this.player = new Player(
       this.ctx,
-      CANVAS_W / 2 - Player.WIDTH / 2, // centrado en X
-      CANVAS_H - Player.HEIGHT - PLAYER_MARGIN // pegado abajo con 5 px de margen
+      CANVAS_W / 2 - Player.WIDTH / 2,
+      CANVAS_H - Player.HEIGHT - PLAYER_MARGIN
     );
 
-    // Enemigos
+    // Enemies (rocks)
     const rock = new Rock(
       this.ctx,
       CANVAS_W / 2 - Rock.WIDTH / 2,
@@ -37,11 +50,11 @@ class Game {
     this.rockMinDelay = ROCK_SPAWN_MIN_MS;
     this.rockMaxDelay = ROCK_SPAWN_MAX_MS;
 
-    // Estado general
+    // Game state
     this.isGameOver = false;
     this.isPaused = false;
 
-    // Botones / menús de interfaz
+    // UI elements
     this.pauseButton = document.getElementById("pause-button");
     this.tryAgainButton = document.getElementById("tryagain-ui");
     this.startMenu = document.getElementById("start-menu");
@@ -50,16 +63,16 @@ class Game {
     // Timer
     this.timerElement = document.getElementById("timer");
     this.elapsedMs = 0;
-    this._timerId = null;       // id del intervalo del timer
-    this._listenersSetup = false; // flag para no duplicar listeners
-    this.timer();               // pintamos 00:00 inicial
+    this._timerId = null;
+    this._listenersSetup = false;
+    this.timer(); // initial 00:00
 
-    // Puntuaciones
+    // Score management
     this.scoreManager = new ScoreManager();
   }
 
   // =====================================================
-  // INICIO / PARADA
+  // GAME LIFECYCLE (START / STOP)
   // =====================================================
 
   start() {
@@ -75,13 +88,19 @@ class Game {
     this.isGameOver = false;
     this.isPaused = false;
     this._resetTimer();
+
+    this.showInstructions = true;
+    this.instructionsStartMs = performance.now();
   }
 
   _startSystems() {
     this.bg.start();
     this.rockSpawn();
     this._startTimer();
+    console.log("Arrancando música gameplay");
+    this.sound.playMusic(this.sound.musicGameplay);
 
+    // Gradually increases rock spawn difficulty
     this.rockDifficultyIntervalId = setInterval(() => {
       if (this.isPaused || this.isGameOver) return;
 
@@ -104,13 +123,13 @@ class Game {
 
   _startLoop() {
     this.drawIntervalId = setInterval(() => {
-      // Si está en pausa o en game over, NO tocamos el canvas -> se queda el último frame
+      // When paused or game over, keep the last frame frozen
       if (this.isPaused || this.isGameOver) return;
 
       this.clear();
       this.move();
-      this.draw();          // 1) PINTAMOS el frame normal
-      this.checkCollisions(); // 2) LUEGO comprobamos colisiones (puede disparar gameOver)
+      this.draw();
+      this.checkCollisions();
     }, this.fps);
   }
 
@@ -163,7 +182,7 @@ class Game {
 
     this._timerId = setInterval(() => {
       if (this.isPaused || this.isGameOver) return;
-      this.elapsedMs += 100;  // contamos décimas
+      this.elapsedMs += 100;
       this.timer();
     }, 100);
   }
@@ -176,27 +195,32 @@ class Game {
   }
 
   // =====================================================
-  // LISTENERS / INPUT
+  // INPUT / LISTENERS
   // =====================================================
 
   setupListener() {
     if (this._listenersSetup) return;
 
-    // Try again (recarga)
+    // Try again (reload)
     addEventListener("click", (event) => this.tryAgain(event));
 
-    // Start game (pantalla inicial)
+    // Mute sound
+    this.muteButtons.forEach((btn) => {
+      btn.addEventListener("click", () => this.toggleMute());
+    });
+
+    // Start game (start screen)
     addEventListener("click", (event) => this.startGame(event));
 
-    // Pausa
+    // Pause
     addEventListener("click", (event) => this.togglePause(event));
     addEventListener("keydown", (event) => this.togglePause(event));
 
-    // Controles del player (teclado)
+    // Keyboard controls
     addEventListener("keydown", (event) => this.player.onKeyPress(event));
     addEventListener("keyup", (event) => this.player.onKeyPress(event));
 
-    // Controles táctiles / ratón sobre el canvas
+    // Pointer / touch controls on canvas
     this.canvas.addEventListener("pointerdown", (event) => {
       this.handlePointerDown(event);
     });
@@ -231,37 +255,48 @@ class Game {
     }
   }
 
+  // UI: toggle global mute state and refresh all mute buttons
+  toggleMute() {
+    this.sound.toggleMute();
+
+    this.muteButtons.forEach((btn) => {
+      if (this.sound.isMuted) {
+        btn.classList.add("muted");
+        btn.textContent = "🔇";
+      } else {
+        btn.classList.remove("muted");
+        btn.textContent = "🔊";
+      }
+    });
+  }
+
   tryAgain(event) {
     const isClicked =
       event.type === "click" && event.target === this.tryAgainButton;
     if (isClicked) location.reload();
   }
 
-  // >>>>>> LÓGICA DEL START GAME <<<<<<
+  // Start menu → game screen transition
   startGame(event) {
     const isClicked =
       event.type === "click" && event.target === this.startButton;
     if (!isClicked) return;
 
-    // Ocultamos el menú de inicio
     if (this.startMenu) {
       this.startMenu.classList.add("hidden");
     }
 
-    // Mostramos canvas
     this.canvas.classList.remove("hidden");
 
-    // Mostramos HUD in-game
     const ingameMenu = document.querySelector(".menu-ingame");
     if (ingameMenu) {
       ingameMenu.classList.remove("hidden");
     }
 
-    // Arrancamos el juego (si no está ya arrancado)
     this.start();
   }
 
-  // Pausa lógica de spawns
+  // Pause rock spawns (logic only)
   pause() {
     if (this.rockSpawnTimeoutId) {
       clearTimeout(this.rockSpawnTimeoutId);
@@ -269,50 +304,43 @@ class Game {
     }
   }
 
-  // Reanudar spawns
+  // Resume rock spawns if game is still active
   resume() {
-    // reanuda spawn solo si no hay timeout activo y no es game over
     if (!this.isGameOver && !this.rockSpawnTimeoutId) {
       this.rockSpawn();
     }
   }
 
-  // ================== INPUT TÁCTIL ==================
+  // ================== TOUCH / POINTER INPUT ==================
 
-handlePointerDown(event) {
-  if (this.isGameOver || this.isPaused) {
-    return;
+  // Touch input: move player left/right depending on tap position
+  handlePointerDown(event) {
+    if (this.isGameOver || this.isPaused) {
+      return;
+    }
+
+    const rect = this.canvas.getBoundingClientRect();
+    const xScreen = event.clientX - rect.left;
+
+    const scaleX = rect.width / this.canvas.width;
+    const playerCenterCanvas = this.player.x + this.player.w / 2;
+    const playerCenterScreen = playerCenterCanvas * scaleX;
+
+    if (xScreen < playerCenterScreen) {
+      this.player.startMoveLeft();
+    } else {
+      this.player.startMoveRight();
+    }
+
+    event.preventDefault();
   }
-
-  // Rectángulo del canvas en la pantalla
-  const rect = this.canvas.getBoundingClientRect();
-
-  // Posición del toque en coordenadas de pantalla (relativa al canvas)
-  const xScreen = event.clientX - rect.left;
-
-  
-  const scaleX = rect.width / this.canvas.width; 
-  const playerCenterCanvas = this.player.x + this.player.w / 2;
-  const playerCenterScreen = playerCenterCanvas * scaleX;
-
-  // Si tocamos a la izquierda del jugador → mover a la izquierda
-  if (xScreen < playerCenterScreen) {
-    this.player.startMoveLeft();
-  } else {
-    this.player.startMoveRight();
-  }
-
-  // evitar scroll del navegador en móvil
-  event.preventDefault();
-}
-
 
   handlePointerUp() {
     this.player.stopMove();
   }
 
   // =====================================================
-  // LOOP: CLEAR / MOVE / DRAW / COLLISIONS
+  // MAIN LOOP: CLEAR / MOVE / DRAW / COLLISIONS
   // =====================================================
 
   clear() {
@@ -325,6 +353,7 @@ handlePointerDown(event) {
     this.checkBounds();
   }
 
+  // Keep player inside horizontal bounds
   checkBounds() {
     if (this.player.x < PLAYER_MARGIN) {
       this.player.x = PLAYER_MARGIN;
@@ -342,16 +371,22 @@ handlePointerDown(event) {
     }
   }
 
+  // =====================================================
+  // GAME OVER
+  // =====================================================
+
   gameOver() {
     if (this.isGameOver) {
       return;
     }
 
+    this.sound.playMusic(this.sound.musicGameOver);
+
     this.isGameOver = true;
     this.stop();
     console.log("GAME OVER");
 
-    // oscurecemos el ÚLTIMO frame ya dibujado
+    // Darken the last rendered frame
     this.paintOverlay();
 
     const finalTime = this.elapsedMs;
@@ -372,16 +407,58 @@ handlePointerDown(event) {
     this.bg.updateAndDraw();
     this.enemies.forEach((enemy) => enemy.draw());
     this.player.draw();
+    this.drawInstructionsOverlay();
   }
 
-  // Pinta un overlay oscuro sobre el canvas actual (lo que haya: fondo + árboles + rocas + player)
+  // Draws a dark overlay over the current canvas frame
   paintOverlay() {
     this.ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
     this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
   }
 
   // =====================================================
-  // SPAWN DE ROCAS
+  // INSTRUCTIONS OVERLAY
+  // =====================================================
+
+  drawInstructionsOverlay() {
+    if (!this.showInstructions) return;
+
+    if (
+      !this.instructionsImg.complete ||
+      this.instructionsImg.naturalWidth === 0
+    )
+      return;
+
+    const now = performance.now();
+    const elapsed = now - this.instructionsStartMs;
+
+    if (elapsed > INSTRUCTIONS_DURATION_MS) {
+      this.showInstructions = false;
+      return;
+    }
+
+    const canvasW = this.canvas.width;
+    const canvasH = this.canvas.height;
+
+    let iw = this.instructionsImg.naturalWidth;
+    let ih = this.instructionsImg.naturalHeight;
+
+    const maxW = canvasW * 0.95;
+    const maxH = canvasH * 0.95;
+
+    const scale = Math.min(maxW / iw, maxH / ih, 1);
+
+    iw *= scale;
+    ih *= scale;
+
+    const ix = (canvasW - iw) / 2;
+    const iy = (canvasH - ih) / 1.5;
+
+    this.ctx.drawImage(this.instructionsImg, ix, iy, iw, ih);
+  }
+
+  // =====================================================
+  // ROCK SPAWNING
   // =====================================================
 
   rockSpawn() {
@@ -393,13 +470,12 @@ handlePointerDown(event) {
       const x = Math.floor(Math.random() * (CANVAS_W - Rock.WIDTH));
       const y = -Rock.HEIGHT;
 
-      // velocidad aleatoria entre ROCK_SPEED_MIN y ROCK_SPEED_MAX
+      // Random vertical speed between ROCK_SPEED_MIN and ROCK_SPEED_MAX
       const speedY =
         ROCK_SPEED_MIN + Math.random() * (ROCK_SPEED_MAX - ROCK_SPEED_MIN);
 
       this.enemies.push(new Rock(this.ctx, x, y, speedY));
 
-      // siguiente spawn
       this.rockSpawn();
     }, delay);
   }

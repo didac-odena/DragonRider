@@ -6,22 +6,49 @@
 
     <title>DragonRider</title>
     <link rel="stylesheet" href="/assets/css/main.css" />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=MedievalSharp&display=swap"
+    />
   </head>
 
   <body>
     <div id="game-container">
-          <div class="menu-ingame hidden">
-      <img
-        class="title-text"
-        src="assets/images/interface/dragonrider-ui.png"
-      />
-      <div id="timer">00:00</div>
-      <button id="pause-button">PAUSE</button>
-    </div>
+      <div class="menu-ingame hidden">
+        <img
+          class="title-text"
+          src="assets/images/interface/dragonrider-ui.png"
+        />
+
+        <div id="timer">00:00</div>
+
+        <div class="menu-controls">
+          <button id="pause-button" class="ui-button">PAUSE</button>
+          <button id="mute-toggle-ingame" class="ui-button ui-icon-button">
+            🔊
+          </button>
+        </div>
+      </div>
+
       <canvas id="main-canvas" class="hidden"></canvas>
 
       <div id="start-menu">
         <img src="assets/images/interface/dragonrider-ui.png" />
+
+        <div id="credit">
+          <p>
+            Game & Code Designed by Dídac Odena ·
+            <a
+              class="github-btn"
+              href="https://github.com/didac-odena/DragonRider"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              GitHub
+            </a>
+          </p>
+        </div>
+
         <img
           id="startgame-ui"
           class="clickable"
@@ -29,6 +56,10 @@
         />
         <!-- Top 5 -->
         <div id="highscore-list-start" class="highscore-list"></div>
+
+        <button id="mute-toggle-menu" class="ui-button ui-icon-button">
+          🔊
+        </button>
       </div>
 
       <div id="gameover-menu" class="hidden">
@@ -58,7 +89,8 @@
       </div>
     </div>
 
-
+    <audio id="ingame-audio" src="assets/audio/ingame-audio.mp3" loop></audio>
+    <audio id="menu-audio" src="assets/audio/menu-audio.mp3" loop></audio>
 
     <script src="assets/js/models/bg/bg-elements.js"></script>
 
@@ -68,12 +100,12 @@
     <script src="assets/js/models/bg/background-controller.js"></script>
     <script src="assets/js/models/bg/background.js"></script>
     <script src="assets/js/models/enemies/rock.js"></script>
-    <script src="assets/js/models/coin.js"></script>
 
     <script src="assets/js/models/player.js"></script>
 
     <script src="assets/js/models/score-manager.js"></script>
     <script src="assets/js/models/highscore-ui.js"></script>
+    <script src="assets/js/models/sound.js"></script>
 
     <script src="assets/js/models/game.js"></script>
 

@@ -1,5 +1,9 @@
+// ======================================================================
+// Player – movement, sprite animation and collision box
+// ======================================================================
+
 class Player {
-  // constantes de tamaño del jugador (para poder usarlas al crear y al centrar en el canvas)
+  // Static dimensions (used for placement and hitbox)
   static WIDTH = 75;
   static HEIGHT = 75;
 
@@ -12,13 +16,15 @@ class Player {
 
     this.vx = 0;
 
+    // Sprite sheet
     this.sprite = new Image();
     this.sprite.src = "/assets/images/player-sprite.png";
 
-    this.sprite.vFrames = 12; //posiciones del sprite
+    // Sprite matrix definition
+    this.sprite.vFrames = 12;
     this.sprite.hFrames = 4;
-    this.sprite.vFrameIndex = 1; //eje X (matriz del sprite)
-    this.sprite.hFrameIndex = 3; //eje Y (matriz del srpite)
+    this.sprite.vFrameIndex = 1;
+    this.sprite.hFrameIndex = 3;
 
     this.sprite.onload = () => {
       this.sprite.isReady = true;
@@ -28,16 +34,22 @@ class Player {
       this.h = Player.HEIGHT;
     };
 
-    this.drawCount = 0; //sirve para contar las veces que se pinta de cara a animateFrames
+    this.drawCount = 0; // Used for frame animation timing
   }
+
+  // =====================================================
+  // KEYBOARD INPUT
+  // =====================================================
 
   onKeyPress(event) {
     const isPressed = event.type === "keydown";
+
     switch (event.keyCode) {
       case KEY_RIGHT:
         if (isPressed) this.vx = PLAYER_SPEED;
-        else if (this.vx > 0) this.vx = 0; //IMPORTANTE! al darle esta condicion hace que no se encalle
+        else if (this.vx > 0) this.vx = 0;
         break;
+
       case KEY_LEFT:
         if (isPressed) this.vx = -PLAYER_SPEED;
         else if (this.vx < 0) this.vx = 0;
@@ -45,72 +57,68 @@ class Player {
     }
   }
 
-  // ==== CONTROLES PARA TÁCTIL / CLICK SENCILLO ====
+  // =====================================================
+  // TOUCH / POINTER CONTROLS
+  // =====================================================
 
-  // Empieza a mover a la izquierda simulando una pulsación de tecla izquierda
   startMoveLeft() {
-    this.onKeyPress({
-      type: "keydown",
-      keyCode: KEY_LEFT,
-    });
+    this.onKeyPress({ type: "keydown", keyCode: KEY_LEFT });
   }
 
-  // Empieza a mover a la derecha simulando una pulsación de tecla derecha
   startMoveRight() {
-    this.onKeyPress({
-      type: "keydown",
-      keyCode: KEY_RIGHT,
-    });
+    this.onKeyPress({ type: "keydown", keyCode: KEY_RIGHT });
   }
 
-  // Deja de mover al jugador (sueltamos izquierda y derecha)
   stopMove() {
-    this.onKeyPress({
-      type: "keyup",
-      keyCode: KEY_LEFT,
-    });
-    this.onKeyPress({
-      type: "keyup",
-      keyCode: KEY_RIGHT,
-    });
+    this.onKeyPress({ type: "keyup", keyCode: KEY_LEFT });
+    this.onKeyPress({ type: "keyup", keyCode: KEY_RIGHT });
   }
+
+  // =====================================================
+  // MOVEMENT
+  // =====================================================
 
   move() {
     this.x += this.vx;
   }
 
+  // =====================================================
+  // DRAW & SPRITE ANIMATION
+  // =====================================================
+
   draw() {
-    if (this.sprite.isReady) {
-      Utils.debugDrawable(this); //para debugar el sprite
+    if (!this.sprite.isReady) return;
 
-      this.ctx.drawImage(
-        this.sprite,
-        this.sprite.vFrameIndex * this.sprite.frameW,
-        this.sprite.hFrameIndex * this.sprite.frameH,
+    Utils.debugDrawable(this);
 
-        this.sprite.frameW,
-        this.sprite.frameH,
+    this.ctx.drawImage(
+      this.sprite,
+      this.sprite.vFrameIndex * this.sprite.frameW,
+      this.sprite.hFrameIndex * this.sprite.frameH,
+      this.sprite.frameW,
+      this.sprite.frameH,
+      this.x,
+      this.y,
+      this.w,
+      this.h
+    );
 
-        this.x,
-        this.y,
-        this.w,
-        this.h
-      );
-      this.animate();
-      this.drawCount++;
-    }
+    this.animate();
+    this.drawCount++;
   }
 
+  // Selects animation based on movement direction
   animate() {
     if (this.vx > 0) {
-      this.animateFrames(2, 0, 3, 10);
+      this.animateFrames(2, 0, 3, 10); // moving right
     } else if (this.vx < 0) {
-      this.animateFrames(1, 0, 3, 10);
+      this.animateFrames(1, 0, 3, 10); // moving left
     } else {
-      this.animateFrames(3, 0, 3, 10);
+      this.animateFrames(3, 0, 3, 10); // idle
     }
   }
 
+  // Cycles through frame row/column in sprite sheet
   animateFrames(initialHFrame, initialVFrame, frames, frequency) {
     if (this.sprite.hFrameIndex !== initialHFrame) {
       this.sprite.hFrameIndex = initialHFrame;
@@ -121,13 +129,17 @@ class Player {
     }
   }
 
+  // =====================================================
+  // COLLISION
+  // =====================================================
+
   collidesWith(other) {
     if (!other) return false;
 
-    // Si el enemigo tiene getHitbox (Rock), la usamos. Si no, usamos sus x,y,w,h directos.
-    const b = typeof other.getHitbox === "function"
-      ? other.getHitbox()
-      : { x: other.x, y: other.y, w: other.w, h: other.h };
+    const b =
+      typeof other.getHitbox === "function"
+        ? other.getHitbox()
+        : { x: other.x, y: other.y, w: other.w, h: other.h };
 
     return (
       this.x < b.x + b.w &&

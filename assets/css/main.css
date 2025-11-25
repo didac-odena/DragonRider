@@ -19,8 +19,19 @@ body {
   background-size: cover;
   background-position: center;
   background-attachment: fixed;
+body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+}
 
-  font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+.menu-ingame,
+.ui-button,
+.highscore-box,
+.highscore-list,
+#timer {
+  font-family: "MedievalSharp", system-ui, serif;
+}
+
 }
 
 html, body {
@@ -42,12 +53,9 @@ canvas {
   box-shadow: 0 0 20px #d4b46a;
   border-radius: 5px;
   background-color: rgb(133, 183, 90);
-  image-rendering: pixelated;
-  image-rendering: crisp-edges;
   width: 100%;
   height: 100%;
   display: block;
-
   touch-action: none;
 }
 
@@ -58,11 +66,51 @@ canvas {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  align-content: center;
+  align-items: center;          /* centrado vertical real */
+  width: 100%;                  /* que coincida con el contenedor */
+  max-width: 600px;             /* mismo ancho máximo que el canvas */
+  margin: 15px auto;            /* centrado horizontal */
+  font-family: "MedievalSharp", system-ui, sans-serif; /* luego te digo esto */
+}
 
-  width: 600px;
-  margin: 15px;
-  font-family: fantasy;
+.menu-controls {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.ui-button {
+  font-family: "MedievalSharp", system-ui, sans-serif;
+  font-size: 16px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+
+  padding: 6px 12px;
+
+  color: rgb(245, 191, 54);              /* dorado */
+  text-shadow: 2px 2px 4px #000000;
+
+  background-color: rgba(0, 0, 0, 0.4);
+  border: 2px solid #d4b46a;
+  border-radius: 6px;
+  box-shadow: 0 0 10px #00000080;
+
+  cursor: pointer;
+}
+
+.ui-button:hover {
+  background-color: rgba(0, 0, 0, 0.6);
+}
+
+
+.ui-icon-button {
+  padding: 4px 8px;
+  font-size: 18px;  /* icono un poco más grande */
+  width: auto;
+}
+
+.ui-icon-button.muted {
+  opacity: 0.5;
 }
 
 .title-text {
@@ -93,6 +141,28 @@ canvas {
   background-color: rgba(0, 0, 0, 0.5);
 }
 
+.mute-toggle {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 50%;
+  background-color: rgba(0, 0, 0, 0.4);
+  color: rgb(245, 191, 54);
+  font-size: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 0 8px #00000080;
+}
+.mute-toggle.muted {
+  opacity: 0.4;
+}
+
+
 /* =========================================================
    START MENU
    ========================================================= */
@@ -120,6 +190,25 @@ canvas {
   max-width: 320px;
 }
 
+#credit {
+  color: #e4ddd0;
+  text-shadow: 2px 2px 4px #000000;
+}
+
+.github-btn {
+  padding: 4px 10px;
+  background: #bd8216;
+  color: white;
+  border-radius: 4px;
+  text-decoration: none;
+  font-family: fantasy;
+}
+
+.github-btn:hover {
+  background: #e3b56e;
+}
+
+
 /* =========================================================
    GAME OVER MENU
    ========================================================= */
@@ -137,10 +226,11 @@ canvas {
   gap: 10px;
   width: 90%;
   height: 90%;
+  margin-top: 10%;
 }
 
 #gameover-menu img {
-  width: 100%;
+  width: 90%;
   height: auto;
 }
 

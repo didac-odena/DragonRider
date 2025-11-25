@@ -1,36 +1,37 @@
+// ======================================================================
+// ScoreManager – local highscore storage and highscore UI
+// ======================================================================
+
 class ScoreManager {
   constructor() {
     this.scores = this.loadScores();
-
-    this.pendingTime = 0;
-    this.uiSetupDone = false;
+    this.pendingTime = 0;       // time of the last run waiting to be saved
+    this.uiSetupDone = false;   // guard to avoid attaching listeners twice
   }
+
+  // =====================================================
+  // PERSISTENCE (LOAD / SAVE)
+  // =====================================================
 
   loadScores() {
     const storage = localStorage.getItem(SCORE_STORAGE_KEY);
-
-    if (!storage) {
-      return [];
-    }
+    if (!storage) return [];
 
     const parsed = JSON.parse(storage);
-
-    if (Array.isArray(parsed)) {
-      return parsed;
-    } else {
-      return [];
-    }
+    return Array.isArray(parsed) ? parsed : [];
   }
 
   saveScores() {
     const json = JSON.stringify(this.scores);
-
     localStorage.setItem(SCORE_STORAGE_KEY, json);
   }
 
+  // =====================================================
+  // NORMALIZATION / VALIDATION
+  // =====================================================
+
   correctName(name) {
-    let clean = String(name);
-    clean = clean.trim();
+    let clean = String(name).trim();
 
     if (clean.length > 10) {
       clean = clean.slice(0, 10);
@@ -40,6 +41,10 @@ class ScoreManager {
     }
     return clean;
   }
+
+  // =====================================================
+  // LEADERBOARD LOGIC
+  // =====================================================
 
   addScore(name, timeSurvived) {
     const safeName = this.correctName(name);
@@ -53,8 +58,8 @@ class ScoreManager {
 
     this.scores.push(newEntry);
 
+    // Sort by best time first and clamp to MAX_SCORES
     this.scores.sort((a, b) => b.timeSurvived - a.timeSurvived);
-
     this.scores = this.scores.slice(0, MAX_SCORES);
 
     this.saveScores();
@@ -66,7 +71,6 @@ class ScoreManager {
     }
 
     const worstScore = this.scores[this.scores.length - 1].timeSurvived;
-
     return timeSurvived >= worstScore;
   }
 
@@ -74,41 +78,37 @@ class ScoreManager {
     return [...this.scores];
   }
 
+  // 00:00.0 format with tenths
   formatTimeWithTenths(ms) {
-    var totalTenths = Math.floor(ms / 100);
-    var totalSeconds = Math.floor(totalTenths / 10);
+    const totalTenths = Math.floor(ms / 100);
+    const totalSeconds = Math.floor(totalTenths / 10);
 
-    var minutes = Math.floor(totalSeconds / 60);
-    var seconds = totalSeconds % 60;
-    var tenths = totalTenths % 10;
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+    const tenths = totalTenths % 10;
 
-    var mm = String(minutes).padStart(2, "0");
-    var ss = String(seconds).padStart(2, "0");
+    const mm = String(minutes).padStart(2, "0");
+    const ss = String(seconds).padStart(2, "0");
 
-    return mm + ":" + ss + "." + tenths;
+    return `${mm}:${ss}.${tenths}`;
   }
 
+  // =====================================================
+  // HIGHSCORE PANEL UI
+  // =====================================================
+
   setupUI() {
-    if (this.uiSetupDone) {
-      return;
-    }
+    if (this.uiSetupDone) return;
 
     const saveButton = document.getElementById("highscore-save-button");
-    if (!saveButton) {
-      return;
-    }
+    if (!saveButton) return;
 
     saveButton.addEventListener("click", () => {
       const input = document.getElementById("highscore-name-input");
-      let name = "";
-
-      if (input) {
-        name = input.value;
-      }
+      const name = input ? input.value : "";
 
       this.addScore(name, this.pendingTime);
       renderHighscoreList("highscore-list-gameover", this.getScores());
-
 
       const panel = document.getElementById("highscore-panel");
       if (panel) {

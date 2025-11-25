@@ -1,9 +1,9 @@
 class Rock {
-  static WIDTH = 64;
-  static HEIGHT = 64;
+  static WIDTH = 40;
+  static HEIGHT = 40;
   static FALL_SPEED = 3; // píxeles por frame
   static ANIM_FREQ = 6; // cada cuántos draws avanza un frame
-  static INSET_HITBOX = 30;
+  static INSET_HITBOX = 20;
 
   constructor(ctx, x, y, speedY) {
     this.ctx = ctx;
